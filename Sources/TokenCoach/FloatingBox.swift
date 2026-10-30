@@ -152,20 +152,14 @@ struct FloatingBoxView: View {
     }
 
     private func limitRow(_ title: String, _ w: Limits.Window) -> some View {
-        let color: Color = w.usedPercent >= 80 ? .red : w.usedPercent >= 50 ? .orange : .green
+        let color = UsageBar.color(w.usedPercent)
         return VStack(alignment: .leading, spacing: 3) {
             HStack(alignment: .firstTextBaseline) {
                 Text(title).font(body1)
                 Spacer()
                 Text("\(Int(w.usedPercent.rounded()))% used").font(body1.weight(.semibold)).foregroundStyle(color).monospacedDigit()
             }
-            GeometryReader { g in
-                ZStack(alignment: .leading) {
-                    Capsule().fill(.primary.opacity(0.12))
-                    Capsule().fill(color).frame(width: g.size.width * min(max(w.usedPercent, 0), 100) / 100)
-                }
-            }
-            .frame(height: big ? 8 : 6)
+            UsageBar(percent: w.usedPercent, height: big ? 8 : 6)
             if size != .small {
                 Text("Resets in \(Format.until(w.resetsAt))").font(small1).foregroundStyle(.secondary).monospacedDigit()
             }

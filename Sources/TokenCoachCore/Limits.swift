@@ -5,10 +5,16 @@ public struct Limits: Sendable {
     public struct Window: Sendable {
         public let usedPercent: Double
         public let resetsAt: Date
+
+        public init(usedPercent: Double, resetsAt: Date) { self.usedPercent = usedPercent; self.resetsAt = resetsAt }
     }
     public let fiveHour: Window?
     public let sevenDay: Window?
     public let savedAt: Date
+
+    public init(fiveHour: Window?, sevenDay: Window?, savedAt: Date) {
+        self.fiveHour = fiveHour; self.sevenDay = sevenDay; self.savedAt = savedAt
+    }
 
     public static let file = FileManager.default.homeDirectoryForCurrentUser
         .appending(path: "Library/Application Support/TokenCoach/statusline.json")

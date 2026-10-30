@@ -2,3 +2,6 @@
 .swiftpm/
 *.xcodeproj
 .DS_Store
+site/TokenCoach.zip
+site/statusline.sh
+site/.vercel

@@ -134,9 +134,26 @@ struct LimitBar: View {
                 Text("\(Int(window.usedPercent.rounded()))% · resets in \(Format.until(window.resetsAt))")
                     .font(.caption).foregroundStyle(.secondary).monospacedDigit()
             }
-            ProgressView(value: min(window.usedPercent, 100), total: 100)
-                .tint(window.usedPercent >= 80 ? .red : window.usedPercent >= 50 ? .orange : .green)
+            UsageBar(percent: window.usedPercent)
         }
+    }
+}
+
+/// Green / orange / red fill bar for a limit %. (ProgressView ignores its tint in some places and draws grey.)
+struct UsageBar: View {
+    let percent: Double
+    var height: CGFloat = 6
+
+    static func color(_ percent: Double) -> Color { percent >= 80 ? .red : percent >= 50 ? .orange : .green }
+
+    var body: some View {
+        GeometryReader { g in
+            ZStack(alignment: .leading) {
+                Capsule().fill(.primary.opacity(0.12))
+                Capsule().fill(Self.color(percent)).frame(width: g.size.width * min(max(percent, 0), 100) / 100)
+            }
+        }
+        .frame(height: height)
     }
 }
 

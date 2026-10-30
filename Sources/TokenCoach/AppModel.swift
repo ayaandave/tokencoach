@@ -36,6 +36,12 @@ final class AppModel: ObservableObject {
     private var timer: Timer?
 
     init() {
+        // TOKENCOACH_DEMO=1: made-up numbers for website screenshots; never reads your chats. See Demo.swift.
+        if ProcessInfo.processInfo.environment["TOKENCOACH_DEMO"] != nil {
+            loadDemo()
+            DispatchQueue.main.async { self.updateBox(); self.showDemoPopover() }
+            return
+        }
         refresh()
         timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refresh() }

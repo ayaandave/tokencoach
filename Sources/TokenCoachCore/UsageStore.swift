@@ -92,6 +92,11 @@ public struct ChatSummary: Sendable {
     public let size: Int          // tokens re-read by the latest reply
     public let weight: Double     // total cost weight in the window
     public let output: Int
+
+    public init(sessionId: String, project: String, lastTime: Date, replies: Int, size: Int, weight: Double, output: Int) {
+        self.sessionId = sessionId; self.project = project; self.lastTime = lastTime
+        self.replies = replies; self.size = size; self.weight = weight; self.output = output
+    }
 }
 
 /// A kind of tool (file reads, web, browser...) and how much it cost.
@@ -101,6 +106,10 @@ public struct ToolEater: Sendable {
     public let tokens: Int        // tokens added to chats
     public let weight: Double     // cost weight: written once, then re-read by every later reply in that chat
     public let biggest: Int       // largest single result
+
+    public init(category: String, calls: Int, tokens: Int, weight: Double, biggest: Int) {
+        self.category = category; self.calls = calls; self.tokens = tokens; self.weight = weight; self.biggest = biggest
+    }
 }
 
 public enum ToolCategory {

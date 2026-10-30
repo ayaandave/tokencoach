@@ -13,6 +13,10 @@ public struct Tip: Sendable, Equatable {
     /// Set for warnings worth a Mac notification. The same key only notifies once,
     /// so it names what the warning is about (this chat, this 5-hour window).
     public let notifyKey: String?
+
+    public init(rule: String, level: Level, title: String, text: String, notifyKey: String?) {
+        self.rule = rule; self.level = level; self.title = title; self.text = text; self.notifyKey = notifyKey
+    }
 }
 
 /// When the rules kick in. Lower them to test: `defaults write com.tokencoach.app chatSoft -int 10000`,
