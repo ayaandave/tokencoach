@@ -8,6 +8,7 @@ final class AppModel: ObservableObject {
     @Published var limits: Limits?
     @Published var currentChat: ChatSummary?
     @Published var topChats: [ChatSummary] = []
+    @Published var toolEaters: [ToolEater] = []
     @Published var todayWeight: Double = 0
     @Published var burnPerMin: Double = 0
     @Published var sparkline: [Double] = []   // weight per minute, last 30 minutes
@@ -29,6 +30,7 @@ final class AppModel: ObservableObject {
             store.refresh()
             let today = Calendar.current.startOfDay(for: Date())
             let chats = store.chats(since: today)
+            let eaters = store.toolEaters(since: today)
             let current = store.currentChat()
             let burn = store.burnRate()
             let now = Date()
@@ -42,6 +44,7 @@ final class AppModel: ObservableObject {
                 self.limits = limits
                 self.currentChat = current
                 self.topChats = Array(chats.prefix(5))
+                self.toolEaters = Array(eaters.prefix(4))
                 self.todayWeight = chats.reduce(0) { $0 + $1.weight }
                 self.burnPerMin = burn
                 self.sparkline = buckets

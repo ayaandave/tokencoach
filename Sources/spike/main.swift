@@ -23,6 +23,16 @@ for c in store.chats(since: today).prefix(8) {
                  (c.project as NSString).lastPathComponent, String(c.sessionId.prefix(8))))
 }
 
+let eaters = store.toolEaters(since: today)
+print("\nTop tool eaters today (share of today's usage, calls, tokens added, biggest single result):")
+for e in eaters.prefix(10) {
+    let share = Int((e.weight / max(total, 1) * 100).rounded())
+    print(String(format: "  %3d%%  %@ %4d calls  %6@ added  biggest %@", share, e.category.padding(toLength: 18, withPad: " ", startingAt: 0), e.calls,
+                 k(e.tokens), k(e.biggest)))
+}
+let unknown = store.results.values.filter { $0.tool == "?" }.count
+print("  (\(store.results.count) tool results in 8 days, \(unknown) with unknown tool)")
+
 let fiveHours = store.turns(since: Date().addingTimeInterval(-5 * 3600))
 print("\nLast 5 hours: \(fiveHours.count) replies, \(k(Int(fiveHours.reduce(0) { $0 + $1.weight }))) weighted")
 print("Burn rate (15 min): \(Int(store.burnRate())) weighted/min")

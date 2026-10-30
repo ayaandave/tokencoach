@@ -14,6 +14,8 @@ struct MenuPopover: View {
             Divider()
             topSection
             Divider()
+            toolSection
+            Divider()
             HStack {
                 Text("TokenCoach").font(.caption).foregroundStyle(.secondary)
                 Spacer()
@@ -81,6 +83,28 @@ struct MenuPopover: View {
                     Spacer()
                     Text("\(c.replies) msgs · \(Format.ago(c.lastTime))").foregroundStyle(.secondary).monospacedDigit()
                 }.font(.callout)
+            }
+        }
+    }
+
+    private var toolSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Top tool eaters today").font(.headline)
+            if model.toolEaters.isEmpty {
+                Text("No tool use yet today.").font(.callout).foregroundStyle(.secondary)
+            }
+            ForEach(model.toolEaters, id: \.category) { e in
+                HStack {
+                    Text("\(Int((e.weight / max(model.todayWeight, 1) * 100).rounded()))%")
+                        .monospacedDigit().frame(width: 38, alignment: .trailing)
+                    Text(e.category).lineLimit(1)
+                    Spacer()
+                    Text("\(e.calls) calls · \(Format.tokens(e.tokens)) added").foregroundStyle(.secondary).monospacedDigit()
+                }.font(.callout)
+            }
+            if !model.toolEaters.isEmpty {
+                Text("Tool output stays in the chat and is re-read by every later message. The rest of your usage is chat history and Claude's writing.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }
     }
