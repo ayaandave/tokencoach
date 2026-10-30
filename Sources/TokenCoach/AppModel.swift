@@ -12,6 +12,9 @@ final class AppModel: ObservableObject {
     @Published var todayWeight: Double = 0
     @Published var burnPerMin: Double = 0
     @Published var sparkline: [Double] = []   // weight per minute, last 30 minutes
+    @Published var tip: Tip?                   // the one tip for right now
+
+    private let notifier = Notifier()
 
     private let store = UsageStore()
     private let queue = DispatchQueue(label: "tokencoach.store")
@@ -40,6 +43,7 @@ final class AppModel: ObservableObject {
                 buckets[i] += t.weight
             }
             let limits = Limits.load()
+            let tips = Coach.tips(store.coachInput(limits: limits, now: now))
             DispatchQueue.main.async {
                 self.limits = limits
                 self.currentChat = current
@@ -48,6 +52,8 @@ final class AppModel: ObservableObject {
                 self.todayWeight = chats.reduce(0) { $0 + $1.weight }
                 self.burnPerMin = burn
                 self.sparkline = buckets
+                self.tip = tips.first
+                self.notifier.consider(tips)
                 self.loaded = true
             }
         }
@@ -71,7 +77,8 @@ final class AppModel: ObservableObject {
 enum Level {
     case green, yellow, red
     init(chatSize: Int) {
-        self = chatSize >= 300_000 ? .red : chatSize >= 150_000 ? .yellow : .green
+        let t = Thresholds.load()
+        self = chatSize >= t.chatHard ? .red : chatSize >= t.chatSoft ? .yellow : .green
     }
 }
 

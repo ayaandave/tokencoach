@@ -40,3 +40,9 @@ if let c = store.currentChat() { print("Current chat: \((c.project as NSString).
 
 let incr = clock.measure { store.refresh() }
 print("\nSecond refresh (only new lines): \(incr)")
+
+let input = store.coachInput(limits: Limits.load())
+print("\nCoach tips right now (best first):")
+for (i, tip) in Coach.tips(input).enumerated() {
+    print("  \(i == 0 ? "→" : " ") [\(tip.level)] \(tip.title): \(tip.text)\(tip.notifyKey != nil ? "  (notifies)" : "")")
+}

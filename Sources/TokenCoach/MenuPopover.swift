@@ -9,6 +9,7 @@ struct MenuPopover: View {
             limitsSection
             Divider()
             chatSection
+            if let t = model.tip { TipCard(tip: t) }
             Divider()
             liveSection
             Divider()
@@ -51,7 +52,6 @@ struct MenuPopover: View {
                     Spacer()
                     Text(Format.project(c.project)).foregroundStyle(.secondary)
                 }.font(.callout)
-                Text(tip(for: c)).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
             } else {
                 Text(model.loaded ? "No chats in the last week." : "Reading your chats…").font(.callout).foregroundStyle(.secondary)
             }
@@ -108,14 +108,6 @@ struct MenuPopover: View {
             }
         }
     }
-
-    private func tip(for c: ChatSummary) -> String {
-        switch Level(chatSize: c.size) {
-        case .red: "Very big chat. Tell Claude to wrap up and save notes, then /clear and start fresh."
-        case .yellow: "Getting long. Finish this task, then wrap up and start a new chat."
-        case .green: "Healthy size. One task per chat keeps it that way."
-        }
-    }
 }
 
 // MARK: - Pieces
@@ -134,6 +126,39 @@ struct LimitBar: View {
             }
             ProgressView(value: min(window.usedPercent, 100), total: 100)
                 .tint(window.usedPercent >= 80 ? .red : window.usedPercent >= 50 ? .orange : .green)
+        }
+    }
+}
+
+struct TipCard: View {
+    let tip: Tip
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: icon).foregroundStyle(color).font(.title3)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tip.title).font(.callout.weight(.semibold))
+                Text(tip.text).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+    }
+
+    private var icon: String {
+        switch tip.level {
+        case .alert: "exclamationmark.triangle.fill"
+        case .warn: "exclamationmark.circle.fill"
+        case .info: "lightbulb.fill"
+        }
+    }
+
+    private var color: Color {
+        switch tip.level {
+        case .alert: .red
+        case .warn: .orange
+        case .info: .accentColor
         }
     }
 }
