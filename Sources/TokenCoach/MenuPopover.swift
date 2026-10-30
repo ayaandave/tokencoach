@@ -17,7 +17,15 @@ struct MenuPopover: View {
             Divider()
             toolSection
             Divider()
-            Toggle("Floating box in the corner", isOn: $model.showBox)
+            HStack {
+                Toggle("Floating box", isOn: $model.showBox)
+                Spacer()
+                Picker("Size", selection: $model.boxSize) {
+                    ForEach(BoxSize.allCases) { Text($0.label).tag($0) }
+                }
+                .pickerStyle(.segmented).labelsHidden().frame(width: 170)
+                .disabled(!model.showBox)
+            }
             Toggle("Open at login", isOn: $model.launchAtLogin)
             HStack {
                 Text("TokenCoach").font(.caption).foregroundStyle(.secondary)

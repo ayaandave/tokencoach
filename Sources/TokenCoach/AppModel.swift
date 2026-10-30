@@ -23,6 +23,11 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Small / Medium / Large floating box; remembered between launches.
+    @Published var boxSize = BoxSize(rawValue: UserDefaults.standard.string(forKey: "floatingBoxSize") ?? "") ?? .medium {
+        didSet { UserDefaults.standard.set(boxSize.rawValue, forKey: "floatingBoxSize") }
+    }
+
     private let notifier = Notifier()
     private var box: FloatingBox?
 
@@ -107,6 +112,19 @@ final class AppModel: ObservableObject {
     }
 }
 
+enum BoxSize: String, CaseIterable, Identifiable {
+    case small, medium, large
+    var id: String { rawValue }
+    var label: String { rawValue.capitalized }
+    var width: CGFloat {
+        switch self {
+        case .small: 240
+        case .medium: 300
+        case .large: 380
+        }
+    }
+}
+
 enum Level {
     case green, yellow, red
     init(chatSize: Int) {
@@ -125,7 +143,7 @@ enum Format {
     }
     static func until(_ d: Date) -> String {
         let m = max(0, Int(d.timeIntervalSinceNow / 60))
-        return m < 60 ? "\(m)m" : "\(m / 60)h \(m % 60)m"
+        return m < 60 ? "\(m)m" : m < 48 * 60 ? "\(m / 60)h \(m % 60)m" : "\(m / 1440)d \(m % 1440 / 60)h"
     }
     static func project(_ path: String) -> String { (path as NSString).lastPathComponent }
 }
