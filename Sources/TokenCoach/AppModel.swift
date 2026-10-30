@@ -1,4 +1,5 @@
 import Foundation
+import ServiceManagement
 import TokenCoachCore
 
 /// Everything the UI shows, refreshed every few seconds from the chat files.
@@ -14,7 +15,16 @@ final class AppModel: ObservableObject {
     @Published var sparkline: [Double] = []   // weight per minute, last 30 minutes
     @Published var tip: Tip?                   // the one tip for right now
 
+    /// The floating box in the screen corner; remembered between launches.
+    @Published var showBox = UserDefaults.standard.object(forKey: "showFloatingBox") as? Bool ?? true {
+        didSet {
+            UserDefaults.standard.set(showBox, forKey: "showFloatingBox")
+            updateBox()
+        }
+    }
+
     private let notifier = Notifier()
+    private var box: FloatingBox?
 
     private let store = UsageStore()
     private let queue = DispatchQueue(label: "tokencoach.store")
@@ -24,6 +34,29 @@ final class AppModel: ObservableObject {
         refresh()
         timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refresh() }
+        }
+        DispatchQueue.main.async { self.updateBox() }
+    }
+
+    private func updateBox() {
+        if showBox {
+            if box == nil { box = FloatingBox(model: self) }
+            box?.show()
+        } else {
+            box?.hide()
+        }
+    }
+
+    /// Open TokenCoach when you log in (only works from the .app bundle).
+    var launchAtLogin: Bool {
+        get { SMAppService.mainApp.status == .enabled }
+        set {
+            objectWillChange.send()
+            do {
+                if newValue { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            } catch {
+                NSLog("TokenCoach: launch at login: \(error)")
+            }
         }
     }
 

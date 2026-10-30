@@ -17,6 +17,8 @@ struct MenuPopover: View {
             Divider()
             toolSection
             Divider()
+            Toggle("Floating box in the corner", isOn: $model.showBox)
+            Toggle("Open at login", isOn: $model.launchAtLogin)
             HStack {
                 Text("TokenCoach").font(.caption).foregroundStyle(.secondary)
                 Spacer()
@@ -132,16 +134,18 @@ struct LimitBar: View {
 
 struct TipCard: View {
     let tip: Tip
+    var compact = false
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: icon).foregroundStyle(color).font(.title3)
             VStack(alignment: .leading, spacing: 2) {
                 Text(tip.title).font(.callout.weight(.semibold))
-                Text(tip.text).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Text(tip.text).font(.caption).foregroundStyle(.secondary)
+                    .lineLimit(compact ? 3 : nil).fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(10)
+        .padding(compact ? 8 : 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
     }
